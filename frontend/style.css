@@ -194,7 +194,7 @@ body {
 .navbar {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  padding: 0.85rem 1.6rem;
+  padding: 0.85rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -204,6 +204,7 @@ body {
   box-shadow: var(--shadow-sm);
   flex-wrap: wrap;
   gap: 0.9rem;
+  width: 100%; /* 改為 100% 寬度，支援大螢幕延展 */
 }
 
 .brand {
@@ -364,19 +365,19 @@ body {
 }
 
 /* ==========================================================================
-   主容器與頂部統計橫條
+   主容器與頂部統計橫條 (已改為支援寬螢幕彈性延展與自適應滿版)
    ========================================================================== */
 .main-container {
   flex: 1;
-  max-width: 1160px;
+  max-width: 96%; /* 在大螢幕上自動延展到 96% 寬度，徹底消除兩側過大空白 */
   width: 100%;
   margin: 1.4rem auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
 }
 
 .stats-summary-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.85rem;
   margin-bottom: 1.6rem;
 }
@@ -427,7 +428,7 @@ body {
    ========================================================================== */
 .kana-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); /* 改為自適應網格，在大螢幕自動排開 */
   gap: 0.85rem;
 }
 
@@ -618,11 +619,12 @@ body {
   color: #f8fafc;
   margin-top: 3.5rem;
   border-top: 1px solid #1e293b;
-  padding: 2.2rem 1.5rem;
+  padding: 2.2rem 2rem;
+  width: 100%; /* 確保頁尾也延展滿版 */
 }
 
 .footer-inner {
-  max-width: 1160px;
+  max-width: 96%; /* 與主容器齊頭並進 */
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
