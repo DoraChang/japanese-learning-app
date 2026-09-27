@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 預設拒絕所有未明確許可的存取
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 使用者帳號與個人檔案集合：僅允許本人讀寫
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // 使用者個人雲端生詞本子集合：僅允許本人存取與管理
+      match /words/{wordId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // 使用者個人學習打卡紀錄子集合：僅允許本人存取
+      match /activities/{activityId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // 官方合法內嵌影音與雙語時間軸單字字幕庫：登入使用者皆可研讀，評價僅限登入會員更新
+    match /media/{mediaId} {
+      allow read: if request.auth != null;
+      allow update: if request.auth != null && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes_count', 'dislikes_count']);
+    }
+
+    // 官方意見反饋集合（直達 ytpre.new1@gmail.com）：允許登入使用者提交新意見反饋
+    match /feedbacks/{feedbackId} {
+      allow create: if request.auth != null && request.resource.data.target_email == 'ytpre.new1@gmail.com';
+      allow read, update, delete: if false;
+    }
+  }
+}

@@ -1,0 +1,656 @@
+/* ==========================================================================
+   日語雲端學習助手 3.1 - 核心樣式表 (CSS)
+   包含：加大字體舒適排版、羅馬拼音放大與方向修正、一般瀏覽器防快取支援、
+         徽章收藏館、沈浸式模糊開箱分級、興趣標籤網格、意見反饋與 YouTube 雙語分詞字典
+   ========================================================================== */
+
+/* 全域變數定義：配色系統、加大版字型尺度、陰影與圓角 */
+:root {
+  --primary-color: #4f46e5;         /* 主色調：靛藍色 */
+  --primary-hover: #4338ca;         /* 主色調懸停加深 */
+  --primary-light: #e0e7ff;         /* 主色調淡色背景 */
+  --accent-pink: #ec4899;           /* 櫻花粉重點色 */
+  --accent-pink-light: #fce7f3;     /* 櫻花粉淡背景 */
+  --bg-main: #f8fafc;               /* 網頁主背景：極簡霧灰白 */
+  --bg-card: #ffffff;               /* 卡片背景：純白 */
+  --text-main: #0f172a;             /* 主標題與深色文字 (高對比度) */
+  --text-muted: #475569;            /* 次要說明文字 (由 64748b 調深增進可讀性) */
+  --border-color: #cbd5e1;          /* 邊框線條 */
+  
+  /* SRS 掌握度專用色彩標記 */
+  --srs-hard: #dc2626;              /* 困難：深緋紅色 */
+  --srs-hard-bg: #fee2e2;           /* 困難淡紅底色 */
+  --srs-practice: #d97706;          /* 需練習：深暖黃色 */
+  --srs-practice-bg: #fef3c7;       /* 需練習淡黃底色 */
+  --srs-mastered: #059669;          /* 已掌握：深翡翠綠 */
+  --srs-mastered-bg: #d1fae5;       /* 已掌握淡綠底色 */
+
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.09);
+  --shadow-lg: 0 12px 28px -4px rgba(0,0,0,0.12);
+  --shadow-xl: 0 24px 45px -8px rgba(0,0,0,0.22);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+}
+
+/* 全域盒模型與加大基礎字型 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.65;
+  font-size: 16px; /* 加大基礎字體尺度 */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   強制 Google 帳號登入防護網 (Login Gate Overlay)
+   ========================================================================== */
+.login-gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  background: var(--bg-card);
+  width: 100%;
+  max-width: 540px;
+  border-radius: var(--radius-lg);
+  padding: 2.8rem 2.2rem;
+  box-shadow: var(--shadow-xl);
+  text-align: center;
+  position: relative;
+  animation: cardPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardPopIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.login-badge-free {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  margin-bottom: 1.1rem;
+}
+
+.login-icon {
+  font-size: 3.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--text-main);
+  margin-bottom: 0.7rem;
+}
+
+.login-desc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 1.6rem;
+}
+
+.login-features {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.1rem;
+  text-align: left;
+  margin-bottom: 1.8rem;
+  font-size: 0.92rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 1.4rem;
+}
+
+.btn-google-login {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #9ca3af;
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.btn-google-login:hover {
+  background: #f9fafb;
+  border-color: #6b7280;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.btn-demo-login {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-demo-login:hover {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.login-footer {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   頂部導航列 (Navbar & User Badge & Prominent Feedback)
+   ========================================================================== */
+.navbar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.85rem 1.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--primary-color);
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  background: transparent;
+  border: none;
+  padding: 0.55rem 1.05rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-tab:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.nav-tab.active {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.lock-indicator {
+  font-size: 0.8rem;
+  margin-left: 0.2rem;
+}
+
+.nav-user-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-badge-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #f1f5f9;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.user-badge-pill:hover {
+  background: #e2e8f0;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #cbd5e1;
+}
+
+.user-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 修真五重境界標籤樣式 (加大清晰字體) */
+.level-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+}
+
+.level-novice { background: #e0e7ff; color: #4338ca; } /* 新手小白 */
+.level-outer  { background: #dcfce7; color: #15803d; } /* 外門弟子 */
+.level-inner  { background: #fef3c7; color: #b45309; } /* 內門弟子 */
+.level-elder  { background: #fce7f3; color: #be185d; } /* 長老 */
+.level-guest  { background: #f1f5f9; color: #475569; } /* 訪客 */
+
+/* 顯目意見反饋按鈕 */
+.btn-prominent-feedback {
+  background: linear-gradient(135deg, #4f46e5, #ec4899);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-prominent-feedback:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.fb-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  display: inline-block;
+  animation: pulseLight 1.5s infinite;
+}
+
+@keyframes pulseLight {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
+.nav-btn-icon {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn-icon:hover {
+  background: #f1f5f9;
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   主容器與頂部統計橫條
+   ========================================================================== */
+.main-container {
+  flex: 1;
+  max-width: 1160px;
+  width: 100%;
+  margin: 1.4rem auto;
+  padding: 0 1rem;
+}
+
+.stats-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.6rem;
+}
+
+.stat-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-pill .icon {
+  font-size: 1.6rem;
+}
+
+.stat-pill .val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.stat-pill .lbl {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.view-section {
+  display: none;
+}
+
+.view-section.active-view {
+  display: block;
+  animation: fadeIn 0.25s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   五十音卡片與羅馬拼音優化（放大、方向正常、無鏡像）
+   ========================================================================== */
+.kana-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.85rem;
+}
+
+.kana-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 0.6rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.kana-card:hover {
+  background: var(--primary-light);
+  border-color: #a5b4fc;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.kana-hira {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.kana-kata {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+
+/* 放大羅馬拼音、確保方向正常、消除鏡像反轉 */
+.kana-romaji {
+  font-size: 1.2rem !important;
+  font-weight: 900 !important;
+  color: var(--primary-color) !important;
+  direction: ltr !important;
+  transform: none !important;
+  unicode-bidi: normal !important;
+}
+
+.card-romaji {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  color: var(--text-muted);
+  direction: ltr !important;
+  transform: none !important;
+}
+
+/* ==========================================================================
+   其餘介面元件與生詞卡、測驗、打卡、排程樣式
+   ========================================================================== */
+.novice-gate-banner {
+  background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin-bottom: 1.6rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.gate-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.3rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gate-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.gate-heading {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #312e81;
+}
+
+.gate-sub {
+  font-size: 0.95rem;
+  color: #4338ca;
+  margin-top: 0.25rem;
+}
+
+.gate-level-badge {
+  background: #4f46e5;
+  color: #ffffff;
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.novice-tabs-bar {
+  display: flex;
+  gap: 0.55rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.3rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.novice-tab-btn {
+  background: transparent;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.novice-tab-btn.active {
+  background: #ffffff;
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.novice-sub-panel {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.novice-sub-panel.active-sub {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+/* 記憶卡與小遊戲 */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.95rem;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.memory-card {
+  aspect-ratio: 1 / 1;
+  background: #f1f5f9;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.memory-card.is-flipped {
+  background: #ffffff;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  transform: rotateY(180deg);
+  box-shadow: var(--shadow-sm);
+}
+
+.memory-card.is-matched {
+  background: #d1fae5;
+  border: 2px solid var(--srs-mastered);
+  color: var(--srs-mastered);
+  cursor: default;
+  transform: scale(0.96);
+}
+
+/* 頁尾 */
+.app-footer {
+  background: #0f172a;
+  color: #f8fafc;
+  margin-top: 3.5rem;
+  border-top: 1px solid #1e293b;
+  padding: 2.2rem 1.5rem;
+}
+
+.footer-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.toast {
+  background: #1e293b;
+  color: #ffffff;
+  padding: 0.85rem 1.3rem;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  animation: slideInRight 0.25s ease;
+}

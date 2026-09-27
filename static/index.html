@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="system">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>國高中智慧學習雲端平台 - 高安全・極簡・智慧考程・AI家教</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       頂部導航列 (Navbar)
+       ======================================================================== -->
+  <header class="navbar">
+    <a href="#" class="brand">
+      <span>🎓 智慧學習平台</span>
+      <span class="brand-badge">國高中版</span>
+    </a>
+
+    <div class="nav-actions">
+      <!-- 身分模擬切換 (供快速展示與測試學生/家長/教師) -->
+      <select id="userRoleSwitcher" class="nav-btn" title="切換測試身分">
+        <option value="student">切換身分：學生 (小明)</option>
+        <option value="parent">切換身分：家長 (陳爸爸)</option>
+        <option value="teacher">切換身分：教師 (林老師)</option>
+      </select>
+
+      <!-- AI 拍照引導家教按鈕 -->
+      <button id="openTutorBtn" class="nav-btn btn-primary" title="開啟 AI 蘇格拉底拍照導師">
+        📷 AI 拍照導師
+      </button>
+
+      <!-- 右上角動態主題切換器 (深色 / 淺色 / 系統自訂，預設系統自訂) -->
+      <div class="theme-selector">
+        <select id="themeSelect" aria-label="切換外觀主題">
+          <option value="system" selected>⚙️ 系統自訂</option>
+          <option value="dark">🌙 深色 (Dark)</option>
+          <option value="light">☀️ 淺色 (Light)</option>
+        </select>
+      </div>
+
+      <!-- 意見回饋按鈕 -->
+      <button id="openFeedbackBtn" class="nav-btn" title="提供改進建言或回報問題">
+        💬 意見反饋
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       主內容區域 (Container)
+       ======================================================================== -->
+  <main class="container">
+
+    <!-- 使用者概要與遊戲化等級進度卡 (Hero Card) -->
+    <section class="user-hero-card">
+      <div class="user-profile-meta">
+        <img id="userAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=student" alt="使用者頭像" class="user-avatar">
+        <div class="user-name-title">
+          <h3 id="userNameDisplay">國中學生・小明</h3>
+          <div class="user-tags">
+            <span id="userRoleBadge" class="badge badge-role">學生</span>
+            <span id="userBindingCodeBadge" class="badge badge-code" title="家長綁定代碼">綁定代碼: STU-8821</span>
+            <span id="userComboBadge" class="badge badge-role" style="display:none;">Combo x0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 級經驗值成長進度條 -->
+      <div class="exp-container">
+        <div class="exp-label">
+          <span id="levelTitleDisplay">🌱 學習萌芽 (Lv.1)</span>
+          <span id="expTextDisplay">EXP: 0 / 60</span>
+        </div>
+        <div class="exp-bar-bg">
+          <div id="expBarFill" class="exp-bar-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 主功能分頁選單 -->
+    <nav class="tab-navigation">
+      <button class="tab-btn active" data-tab="tab-study">📚 智能刷題與題庫</button>
+      <button class="tab-btn" data-tab="tab-planner">💡 智慧考程規劃 (選填)</button>
+      <button class="tab-btn" data-tab="tab-mistakes">📝 智慧錯題本</button>
+      <button class="tab-btn" id="parentTabBtn" data-tab="tab-parent">👨‍👩‍👧 家長專區</button>
+    </nav>
+
+    <!-- ====================================================================
+         分頁 1: 智能刷題與題庫 (Study)
+         ==================================================================== -->
+    <div id="tab-study" class="tab-content active">
+      <!-- 多維度聯動教材版本過濾列 -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>學制選擇</label>
+          <select id="filterSchoolLevel">
+            <option value="junior">國中 (Junior High)</option>
+            <option value="senior">高中 (Senior High)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>年級</label>
+          <select id="filterGrade">
+            <option value="j7">國一 (七年級)</option>
+            <option value="j8">國二 (八年級)</option>
+            <option value="j9">國三 (九年級)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>出版社</label>
+          <select id="filterPublisher">
+            <option value="">全部出版社</option>
+            <option value="康軒">康軒</option>
+            <option value="翰林">翰林</option>
+            <option value="南一">南一</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>科目</label>
+          <select id="filterSubject">
+            <option value="">全部科目</option>
+            <option value="數學">數學</option>
+            <option value="理化">理化 / 自然</option>
+            <option value="英文">英文</option>
+            <option value="國文">國文</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>限定標籤</label>
+          <select id="filterTag">
+            <option value="">全部標籤</option>
+            <option value="#期中重點">#期中重點</option>
+            <option value="#易混淆題">#易混淆題</option>
+            <option value="#挑戰題">#挑戰題</option>
+            <option value="#歷屆會考">#歷屆會考</option>
+            <option value="#素養導向">#素養導向</option>
+          </select>
+        </div>
+
+        <button id="applyFilterBtn" class="action-btn btn-primary" style="margin-top: auto;">
+          🔍 篩選題目
+        </button>
+      </div>
+
+      <!-- 題目呈現容器 -->
+      <div id="questionsContainer">
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">載入題目中...</p>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         分頁 2: 智慧考程與每日行程規劃 (Planner)
+         ==================================================================== -->
+    <div id="tab-planner" class="tab-content">
+      <div class="planner-panel">
+        <div class="planner-header">
+          <div>
+            <h2>🗓️ 智慧考程與每日行程規劃引擎</h2>
+            <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.25rem;">
+              非強制性自由規劃：開啟時自動依段考日期計算每日進度並保留緩衝休息日；關閉時隨選自主刷題。
+            </p>
+          </div>
+
+          <div class="toggle-container">
+            <label style="font-weight: 600; font-size: 0.95rem;">啟用智慧考程：</label>
+            <input type="checkbox" id="plannerToggle" style="transform: scale(1.4); cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- 考程設定面板 -->
+        <div id="plannerSettingsBox" style="background: var(--bg-primary); padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+          <h4 style="margin-bottom: 1rem;">⚙️ 段考參數與範圍設定</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div class="filter-group">
+              <label>考程名稱</label>
+              <input type="text" id="planExamName" value="第一次段考">
+            </div>
+            <div class="filter-group">
+              <label>起始日期</label>
+              <input type="date" id="planStartDate">
+            </div>
+            <div class="filter-group">
+              <label>目標段考日</label>
+              <input type="date" id="planExamDate">
+            </div>
+            <div class="filter-group">
+              <label>考前緩衝與衝刺天數</label>
+              <input type="number" id="planBufferDays" min="0" max="7" value="2">
+            </div>
+          </div>
+          <div style="margin-top: 1rem; text-align: right;">
+            <button id="savePlanConfigBtn" class="action-btn btn-primary">儲存考程並重新排程</button>
+          </div>
+        </div>
+
+        <!-- 考程倒數與狀態儀表板 -->
+        <div id="plannerDashboard" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+          <div style="flex: 1; min-width: 180px; background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">距離考試倒數</span>
+            <h3 id="planDaysRemaining" style="font-size: 1.8rem; color: var(--accent-color); margin-top: 0.2rem;">-- 天</h3>
+          </div>
+          <div style="flex: 1; min-width: 180px; background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">目前排程進度</span>
+            <h3 id="planProgressPercent" style="font-size: 1.8rem; color: var(--success-color); margin-top: 0.2rem;">0%</h3>
+          </div>
+          <div style="flex: 1; min-width: 180px; background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-md); text-align: center;">
+            <span style="font-size: 0.82rem; color: var(--text-secondary);">進度狀態</span>
+            <h3 id="planAheadStatus" style="font-size: 1.2rem; color: var(--text-primary); margin-top: 0.4rem;">按部就班</h3>
+          </div>
+        </div>
+
+        <!-- 每日行程清單 (Schedule Grid) -->
+        <h3 style="margin-bottom: 0.75rem;">📅 每日智慧行程推薦</h3>
+        <div id="dailyScheduleContainer" class="schedule-grid">
+          <!-- 動態載入每日卡片 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         分頁 3: 智慧錯題本 (Mistakes)
+         ==================================================================== -->
+    <div id="tab-mistakes" class="tab-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2>📝 智慧錯題本與熟練度機制</h2>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            刷題答錯自動收錄；透過複習連續答對 2 次或熟練度達 100% 即可熟練畢業並獲得額外 EXP！
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="viewPendingMistakesBtn" class="action-btn btn-primary">待複習錯題</button>
+          <button id="viewGraduatedMistakesBtn" class="action-btn">🎓 已熟練畢業</button>
+        </div>
+      </div>
+
+      <!-- 錯題卡片清單 -->
+      <div id="mistakesContainer">
+        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">目前沒有待複習的錯題，太棒了！</p>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         分頁 4: 家長專區 (Parent Dashboard)
+         ==================================================================== -->
+    <div id="tab-parent" class="tab-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2>👨‍👩‍👧 家長專區 (嚴格資安與防越權隔離)</h2>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            僅能存取已綁定之未成年子女資料；支援查看學習儀表板與指派自主作業。
+          </p>
+        </div>
+        <button id="openAddChildBtn" class="action-btn btn-primary">➕ 添加小孩帳號</button>
+      </div>
+
+      <!-- 已綁定子女清單 -->
+      <div id="parentChildrenContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <!-- 動態注入已綁定子女卡片 -->
+      </div>
+
+      <!-- 家長已指派之作業清單 -->
+      <h3 style="margin-bottom: 0.75rem;">📋 已指派之學習作業進度</h3>
+      <div id="parentHomeworksContainer">
+        <p style="color: var(--text-muted);">目前尚未指派作業。</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================
+       彈窗 1: 首次登入身分與年齡確認精靈 (Onboarding Wizard Modal)
+       ======================================================================== -->
+  <div id="onboardingModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>👋 歡迎加入！請完成身分確認</h3>
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+        為確保未成年人個資安全與提供最貼合的教材題庫，請先設定您的角色與實質年齡。
+      </p>
+
+      <form id="onboardingForm">
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>請選擇您的身分角色：</label>
+          <select id="onboardRole" required>
+            <option value="student">學生 (自主學習、刷題與考程規劃)</option>
+            <option value="parent">家長 (綁定子女、進度關懷與作業指派)</option>
+            <option value="teacher">教師 (教學管理)</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>您的年齡 (歲)：</label>
+          <input type="number" id="onboardAge" min="6" max="99" value="14" required>
+          <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+            * 未滿 18 歲將自動套用未成年保護機制，並產生專屬家長綁定代碼。
+          </span>
+        </div>
+
+        <div id="studentExtraFields">
+          <div class="filter-group" style="margin-bottom: 1rem;">
+            <label>目前就讀學制：</label>
+            <select id="onboardSchoolLevel">
+              <option value="junior">國中 (Junior High)</option>
+              <option value="senior">高中 (Senior High)</option>
+            </select>
+          </div>
+
+          <div class="filter-group" style="margin-bottom: 1rem;">
+            <label>年級：</label>
+            <select id="onboardGrade">
+              <option value="j7">國一 (七年級)</option>
+              <option value="j8" selected>國二 (八年級)</option>
+              <option value="j9">國三 (九年級)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="text-align: right; margin-top: 1.5rem;">
+          <button type="submit" class="action-btn btn-primary" style="width: 100%;">
+            完成確認並進入平台
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       彈窗 2: AI 拍照引導導師視窗 (AI Photo Tutor Modal - Socratic Guidance)
+       ======================================================================== -->
+  <div id="tutorModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3>🦉 AI 小家教・蘇格拉底拍照引導</h3>
+        <button class="close-btn" id="closeTutorBtn">&times;</button>
+      </div>
+
+      <div style="background: var(--accent-soft); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.82rem; color: var(--accent-color);">
+        🛡️ <strong>蘇格拉底教學鐵律：</strong>小老師絕對不直接給最終答案，而是引導你拆解步驟、提示觀念並反問思考！
+      </div>
+
+      <div class="filter-group" style="margin-bottom: 1rem;">
+        <label>拍攝或選取題目照片：</label>
+        <input type="file" id="tutorFileInput" accept="image/*">
+      </div>
+
+      <div id="imagePreviewContainer" style="display: none; margin-bottom: 1rem; text-align: center;">
+        <img id="imagePreview" src="" alt="題目相片預覽" style="max-height: 200px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+      </div>
+
+      <div class="filter-group" style="margin-bottom: 1rem;">
+        <label>科目類別：</label>
+        <select id="tutorSubjectSelect">
+          <option value="數學">數學</option>
+          <option value="理化">理化 / 自然</option>
+          <option value="英文">英文</option>
+          <option value="國文">國文</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="margin-bottom: 1rem;">
+        <label>你目前卡住的地方或想法 (選填)：</label>
+        <input type="text" id="tutorStudentThought" placeholder="例如：我不知道第一步應該先用乘法公式還是十字交乘法...">
+      </div>
+
+      <button id="askTutorSubmitBtn" class="action-btn btn-primary" style="width: 100%;">
+        🔍 啟動蘇格拉底引導分析
+      </button>
+
+      <!-- 引導回應呈現區域 -->
+      <div id="tutorResultBox" style="display: none; margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <!-- 動態渲染 AI 引導內容 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       彈窗 3: 家長添加小孩帳號 (Add Child Modal)
+       ======================================================================== -->
+  <div id="addChildModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>➕ 添加並綁定子女帳號</h3>
+        <button class="close-btn" id="closeAddChildBtn">&times;</button>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
+        輸入小孩的 8 碼專屬綁定代碼（例如 <code>STU-8821</code>）或其登錄之 Google Email。
+      </p>
+
+      <form id="addChildForm">
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>小孩 8 碼綁定代碼 (優先)：</label>
+          <input type="text" id="inputBindingCode" placeholder="如 STU-8821">
+        </div>
+
+        <div style="text-align: center; margin: 0.5rem 0; color: var(--text-muted); font-size: 0.85rem;">— 或 —</div>
+
+        <div class="filter-group" style="margin-bottom: 1.25rem;">
+          <label>小孩 Google 帳號 Email：</label>
+          <input type="email" id="inputChildEmail" placeholder="student@example.com">
+        </div>
+
+        <button type="submit" class="action-btn btn-primary" style="width: 100%;">確認添加綁定</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       彈窗 4: 家長指派作業視窗 (Assign Homework Modal)
+       ======================================================================== -->
+  <div id="assignHomeworkModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📝 指派學習作業給子女</h3>
+        <button class="close-btn" id="closeAssignHomeworkBtn">&times;</button>
+      </div>
+
+      <form id="assignHomeworkForm">
+        <input type="hidden" id="assignTargetChildId">
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>作業名稱：</label>
+          <input type="text" id="hwTitle" placeholder="如：第一次段考數學錯題自主複習" required>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>科目：</label>
+          <select id="hwSubject">
+            <option value="數學">數學</option>
+            <option value="理化">理化 / 自然</option>
+            <option value="英文">英文</option>
+            <option value="國文">國文</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>目標練習題數：</label>
+          <input type="number" id="hwTargetCount" min="1" max="50" value="5" required>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>截止日期：</label>
+          <input type="date" id="hwDueDate" required>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1.25rem;">
+          <label>家長叮嚀說明 (選填)：</label>
+          <input type="text" id="hwDescription" placeholder="完成後可自由玩一小時遊戲！">
+        </div>
+
+        <button type="submit" class="action-btn btn-primary" style="width: 100%;">發布作業指派</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       彈窗 5: 即時意見反饋與 Bug 回報視窗 (Feedback Modal)
+       ======================================================================== -->
+  <div id="feedbackModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>💬 意見反饋與問題回報</h3>
+        <button class="close-btn" id="closeFeedbackBtn">&times;</button>
+      </div>
+
+      <form id="feedbackForm">
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>反饋類別：</label>
+          <select id="fbCategory">
+            <option value="suggestion">功能改進建言</option>
+            <option value="bug">系統程式錯誤 (Bug)</option>
+            <option value="question">題庫內容疑義</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1rem;">
+          <label>詳細說明：</label>
+          <textarea id="fbContent" rows="4" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.5rem; width: 100%; outline: none;" placeholder="請描述您的建議或遇到的狀況..." required></textarea>
+        </div>
+
+        <div class="filter-group" style="margin-bottom: 1.25rem;">
+          <label>聯絡信箱 (選填)：</label>
+          <input type="email" id="fbContactEmail" placeholder="your_email@example.com">
+        </div>
+
+        <button type="submit" class="action-btn btn-primary" style="width: 100%;">送出反饋</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       頁尾 (Footer)
+       ======================================================================== -->
+  <footer class="footer">
+    <p>© 2026 國高中智慧學習雲端平台・純公益開放教育專案</p>
+    <div class="zero-payment-notice">
+      🔒 本平台秉持純公益理念，絕無付費機制、無信用卡介接與無任何金流交易
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

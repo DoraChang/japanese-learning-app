@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日語智慧雲端學習助手 3.1 - 100% 免費無廣告合法跨平台日語學習 PWA</title>
+  
+  <!-- PWA 漸進式網頁應用支援標籤 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  
+  <!-- 載入專案核心樣式表 (附帶版本參數確保防快取即時更新) -->
+  <link rel="stylesheet" href="/static/style.css?v=3.1.0">
+</head>
+<body>
+
+  <!-- ====================================================================== -->
+  <!-- 強制 Google 帳號登入防護網 (Mandatory Login Gate Overlay)               -->
+  <!-- ====================================================================== -->
+  <div class="login-gate-overlay" id="loginGateOverlay">
+    <div class="login-card">
+      <div class="login-badge-free">🛡️ 100% 免費 · 零廣告 · 正版授權 · Spark 守護</div>
+      <div class="login-icon">🌸</div>
+      <h1 class="login-title">日語智慧雲端學習助手</h1>
+      <p class="login-desc">
+        依循修真五重境界（新手小白 ➔ 外門弟子 ➔ 內門弟子 ➔ 長老 ➔ 訪客）展開進階修行。<br>
+        為保障個人雲端生詞本與修行打卡資料安全，請先透過 Google 帳號完成登入。
+      </p>
+
+      <div class="login-features">
+        <div class="feat-item">✨ <b>純淨體驗：</b> 零付費機制，完全基於 Firebase 免費 Spark 方案安全沙盒</div>
+        <div class="feat-item">🎬 <b>正版影音：</b> 採用 YouTube 官方內嵌播放器與原創雙語分詞懸浮字典</div>
+        <div class="feat-item">🏆 <b>徽章榮耀：</b> 專屬徽章收藏館，記錄境界突破與連續修行里程碑</div>
+        <div class="feat-item">🎯 <b>能力定級：</b> 支援動態能力測試分級與智慧降階保障機制</div>
+      </div>
+
+      <div class="login-actions">
+        <!-- 正式 Google 登入按鈕 -->
+        <button class="btn-google-login" id="btnGoogleSignIn">
+          <svg class="google-icon" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          使用 Google 帳號安全登入
+        </button>
+
+        <!-- 快速體驗 / 離線測試登入按鈕 -->
+        <button class="btn-demo-login" id="btnDemoLogin">
+          🚀 本機快速體驗 / 示範帳號登入
+        </button>
+      </div>
+
+      <div class="login-footer">
+        🔒 採用 Firebase 嚴格資料庫防護規則 · 個人資料僅限本人存取
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 頂部導航列：品牌標識、分頁切換按鈕、使用者資訊與反饋按鈕                    -->
+  <!-- ====================================================================== -->
+  <header class="navbar">
+    <div class="brand">
+      <span class="brand-icon">🌸</span>
+      <span class="brand-text">日語雲端助手 <small style="font-size: 0.72rem; color: var(--primary-color);">v3.1</small></span>
+    </div>
+
+    <!-- 主導航分頁 -->
+    <nav class="nav-tabs" id="mainNavTabs">
+      <button class="nav-tab active" data-tab="novice" data-target="viewNovice">
+        <span>⚔️</span> 新手試煉
+      </button>
+      <button class="nav-tab" data-tab="badges" data-target="viewBadges">
+        <span>🏆</span> 徽章館
+      </button>
+      <button class="nav-tab" data-tab="video" data-target="viewVideo" id="tabVideo">
+        <span>🎬</span> 影音字典
+        <span class="lock-indicator" id="videoLockIndicator" style="display: none;">🔒</span>
+      </button>
+      <button class="nav-tab" data-tab="flashcard" data-target="viewFlashcard">
+        <span>🎴</span> 3D 生詞卡
+      </button>
+      <button class="nav-tab" data-tab="quiz" data-target="viewQuiz">
+        <span>🎮</span> 單字測驗
+      </button>
+      <button class="nav-tab" data-tab="streak" data-target="viewStreak">
+        <span>📅</span> 學習打卡
+      </button>
+      <button class="nav-tab" data-tab="vocab" data-target="viewVocab">
+        <span>📖</span> 雲端單字本
+      </button>
+    </nav>
+
+    <!-- 使用者身分與顯目反饋按鈕 -->
+    <div class="nav-user-panel">
+      <div class="user-badge-pill" id="btnOpenPreferences" title="點擊檢視個人檔案與偏好設定">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ninja" class="user-avatar" id="navUserAvatar" alt="頭像">
+        <span class="user-name" id="navUserName">訪客</span>
+        <span class="level-tag level-novice" id="navUserLevel">新手小白</span>
+      </div>
+      <!-- 顯目意見反饋按鈕 -->
+      <button class="btn-prominent-feedback" id="btnOpenFeedback" title="提出寶貴意見回饋直達官方信箱">
+        <span class="fb-pulse-dot"></span>
+        <span>💌 意見反饋</span>
+      </button>
+      <button class="nav-btn-icon" id="btnLogout" title="登出當前帳號">🚪 登出</button>
+    </div>
+  </header>
+
+  <!-- ====================================================================== -->
+  <!-- 主畫面容器                                                            -->
+  <!-- ====================================================================== -->
+  <main class="main-container">
+
+    <!-- 學習進度整體即時統計橫條 -->
+    <section class="stats-summary-bar">
+      <div class="stat-pill">
+        <div class="icon">🔥</div>
+        <div>
+          <div class="val" id="statNavStreak" style="color: #f97316;">0</div>
+          <div class="lbl">連續打卡 (天)</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">📚</div>
+        <div>
+          <div class="val" id="statTotalWords">0</div>
+          <div class="lbl">雲端生詞數</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">🟢</div>
+        <div>
+          <div class="val" id="statMastered" style="color: var(--srs-mastered);">0</div>
+          <div class="lbl">已掌握 (Mastered)</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">🟡</div>
+        <div>
+          <div class="val" id="statNeedPractice" style="color: var(--srs-practice);">0</div>
+          <div class="lbl">需練習 (Practice)</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">🔴</div>
+        <div>
+          <div class="val" id="statHard" style="color: var(--srs-hard);">0</div>
+          <div class="lbl">困難生詞 (Hard)</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">🏆</div>
+        <div>
+          <div class="val" id="statBadgeCount" style="color: #8b5cf6;">0 / 8</div>
+          <div class="lbl">已解鎖成就徽章</div>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="icon">🎯</div>
+        <div>
+          <div class="val" id="statAccuracy" style="color: var(--primary-color);">0%</div>
+          <div class="lbl">測驗平均正確率</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 0：新手試煉與晉升機制 (Novice Trials & Level Gate)              -->
+    <!-- ==================================================================== -->
+    <section id="viewNovice" class="view-section active-view">
+      <!-- 晉升狀態看板 -->
+      <div class="novice-gate-banner" id="noviceGateBanner">
+        <div class="gate-status-header">
+          <div class="gate-title-group">
+            <span class="gate-icon">🥋</span>
+            <div>
+              <h2 class="gate-heading">新手試煉堂 · 晉級外門弟子之門</h2>
+              <p class="gate-sub" id="noviceStatusMsg">
+                完成【五十音圖解學習】並於三項試煉小遊戲皆達到 80% 正確率，即可晉升【外門弟子】解鎖影音辭典！
+              </p>
+            </div>
+          </div>
+          <div class="gate-level-badge" id="gateCurrentLevelBadge">新手小白</div>
+        </div>
+
+        <div class="gate-metrics-grid">
+          <div class="metric-card" id="metricKanaCard">
+            <div class="metric-icon">📖</div>
+            <div class="metric-info">
+              <div class="metric-title">五十音圖研讀</div>
+              <div class="metric-val" id="metricKanaStatus">未完成 ❌</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🃏</div>
+            <div class="metric-info">
+              <div class="metric-title">關卡一：翻牌配對</div>
+              <div class="metric-val" id="metricGame1Acc">0.0%</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">🎧</div>
+            <div class="metric-info">
+              <div class="metric-title">關卡二：聽音辨字</div>
+              <div class="metric-val" id="metricGame2Acc">0.0%</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-info">
+              <div class="metric-title">關卡三：極速打字</div>
+              <div class="metric-val" id="metricGame3Acc">0.0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新手試煉模組內容區（分頁：五十音 / 試煉三小遊戲） -->
+      <div class="novice-tabs-bar">
+        <button class="novice-tab-btn active" data-novice-sub="kana">📖 五十音清音圖解與語音朗讀</button>
+        <button class="novice-tab-btn" data-novice-sub="game1">🃏 試煉一：假名翻牌配對</button>
+        <button class="novice-tab-btn" data-novice-sub="game2">🎧 試煉二：假名聽音辨字</button>
+        <button class="novice-tab-btn" data-novice-sub="game3">⚡ 試煉三：羅馬拼音打字</button>
+      </div>
+
+      <!-- 子模組 A：五十音圖解 -->
+      <div class="novice-sub-panel active-sub" id="noviceSubKana">
+        <div class="panel-header-action">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800;">基礎五十音清音表 (清音・Seion)</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">點擊假名格子即可聆聽標準真人發音，建議熟讀後點擊右方按鈕完成標記。</p>
+          </div>
+          <button class="btn-primary-action" id="btnMarkKanaComplete">
+            ✅ 標記已掌握五十音
+          </button>
+        </div>
+        <div class="kana-grid" id="kanaGridContainer">
+          <!-- 由 JavaScript 動態生成 50 音卡片 -->
+        </div>
+      </div>
+
+      <!-- 子模組 B：試煉一 假名翻牌記憶配對 -->
+      <div class="novice-sub-panel" id="noviceSubGame1">
+        <div class="game-control-bar">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800;">🃏 試煉一：假名與羅馬音翻牌記憶配對</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">翻開兩張卡片，若平假名與對應羅馬音相同即成功消除！全部配對完畢結算正確率。</p>
+          </div>
+          <div class="game-stats-display">
+            <span>配對成功：<b id="g1MatchedPairs" style="color: var(--srs-mastered);">0</b> / 6</span>
+            <span>翻牌次數：<b id="g1TotalFlips">0</b></span>
+            <button class="btn-game-restart" id="btnRestartGame1">🔄 重新開始本關</button>
+          </div>
+        </div>
+        <div class="memory-grid" id="game1MemoryGrid">
+          <!-- 12 張翻牌卡片動態渲染 -->
+        </div>
+        <div class="game-result-box" id="game1ResultBox" style="display: none;"></div>
+      </div>
+
+      <!-- 子模組 C：試煉二 假名聽音辨字挑戰 -->
+      <div class="novice-sub-panel" id="noviceSubGame2">
+        <div class="game-control-bar">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800;">🎧 試煉二：假名聽音辨字挑戰 (共 5 題)</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">聆聽日語原生語音，從四個選項中選出對應的正確假名。</p>
+          </div>
+          <div class="game-stats-display">
+            <span>進度：<b id="g2CurrentIndex">1</b> / 5</span>
+            <span>答對：<b id="g2CorrectCount" style="color: var(--srs-mastered);">0</b></span>
+            <button class="btn-game-restart" id="btnRestartGame2">🔄 重新開始挑戰</button>
+          </div>
+        </div>
+        <div class="audio-challenge-card" id="game2ChallengeCard">
+          <div class="audio-prompt-circle" id="btnPlayGame2Audio" title="點擊再次播放發音">
+            <span class="audio-wave-icon">🔊</span>
+            <span style="font-size: 0.95rem; font-weight: 700;">點擊聽音</span>
+          </div>
+          <div class="audio-options-grid" id="game2OptionsGrid">
+            <!-- 4 個選項按鈕動態生成 -->
+          </div>
+        </div>
+        <div class="game-result-box" id="game2ResultBox" style="display: none;"></div>
+      </div>
+
+      <!-- 子模組 D：試煉三 羅馬拼音極速打字 -->
+      <div class="novice-sub-panel" id="noviceSubGame3">
+        <div class="game-control-bar">
+          <div>
+            <h3 style="font-size: 1.25rem; font-weight: 800;">⚡ 試煉三：羅馬拼音極速打字拼寫 (共 5 題)</h3>
+            <p style="color: var(--text-muted); font-size: 0.92rem;">看著螢幕上的假名，在輸入框中輸入正確的英文字母羅馬拼音（例如看到「か」輸入「ka」）。</p>
+          </div>
+          <div class="game-stats-display">
+            <span>進度：<b id="g3CurrentIndex">1</b> / 5</span>
+            <span>答對：<b id="g3CorrectCount" style="color: var(--srs-mastered);">0</b></span>
+            <button class="btn-game-restart" id="btnRestartGame3">🔄 重新開始挑戰</button>
+          </div>
+        </div>
+        <div class="typing-challenge-card" id="game3ChallengeCard">
+          <div class="typing-target-kana" id="g3TargetKana">あ</div>
+          <form id="formGame3Submit" class="typing-input-row">
+            <input type="text" id="inputGame3Romaji" class="typing-input" placeholder="請輸入羅馬拼音..." autocomplete="off" autofocus required>
+            <button type="submit" class="btn-submit-typing">送出</button>
+          </form>
+          <div id="g3FeedbackTip" class="typing-feedback-tip"></div>
+        </div>
+        <div class="game-result-box" id="game3ResultBox" style="display: none;"></div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 1：成就徽章收藏館 (Achievement Badge Gallery) (New v3.1)         -->
+    <!-- ==================================================================== -->
+    <section id="viewBadges" class="view-section">
+      <div class="badge-hero-banner">
+        <div class="badge-hero-info">
+          <div class="badge-big-trophy">🏆</div>
+          <div>
+            <h2 class="badge-hero-title">修真榮耀 · 徽章成就收藏館</h2>
+            <p class="badge-hero-desc">
+              記錄每一位學習者自「新手小白」歷經考驗晉升「長老」的道途光輝。達成不同境界與修行里程碑即可解鎖專屬徽章！
+            </p>
+          </div>
+        </div>
+        <div class="badge-progress-box">
+          <div class="b-prog-title">已解鎖徽章進度</div>
+          <div class="b-prog-val" id="badgeProgressCount">0 / 8</div>
+        </div>
+      </div>
+
+      <!-- 徽章分類切換 -->
+      <div class="badge-filter-row">
+        <button class="badge-filter-btn active" data-badge-filter="all">全部徽章</button>
+        <button class="badge-filter-btn" data-badge-filter="境界徽章">🥋 修真境界徽章</button>
+        <button class="badge-filter-btn" data-badge-filter="里程碑成就">🔥 修行里程碑</button>
+      </div>
+
+      <!-- 徽章展示網格 -->
+      <div class="badges-gallery-grid" id="badgesGalleryGrid">
+        <!-- 由 JavaScript 動態渲染已解鎖與未解鎖徽章 -->
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 2：官方合法內嵌雙語影音字典 (Legal Video Dictionary)             -->
+    <!-- ==================================================================== -->
+    <section id="viewVideo" class="view-section">
+      <!-- 鎖定遮罩（若階級為新手小白時呈現） -->
+      <div class="feature-locked-overlay" id="videoLockOverlay" style="display: none;">
+        <div class="locked-card">
+          <div class="lock-big-icon">🔒</div>
+          <h3 class="lock-title">此境界尚未解鎖【雙語影音字典】</h3>
+          <p class="lock-desc">
+            目前修為：<b id="lockUserLevelText">新手小白</b>。<br>
+            請先至【新手試煉堂】完成五十音圖研讀並通關三項試煉（正確率達 80%），晉升為【外門弟子】後即可解鎖所有正版動漫與 J-Pop 雙語字典！
+          </p>
+          <div style="display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-primary-action" id="btnGoToNoviceTrial">立即前往新手試煉堂 ⚔️</button>
+            <button class="btn-filter" id="btnOpenPlacementTest">參與動態能力定級測試 🎯</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-layout-container">
+        <!-- 頂部影片分類選擇與資訊列 -->
+        <div class="video-header-bar">
+          <div class="category-filter-group">
+            <button class="cat-pill active" data-cat="all">全部影片</button>
+            <button class="cat-pill" data-cat="Anime">動漫經典 (Anime)</button>
+            <button class="cat-pill" data-cat="J-Pop">J-Pop 熱門歌曲</button>
+          </div>
+          <div class="video-interest-controls">
+            <span style="font-size: 0.9rem; color: var(--text-muted);">影片推薦評價：</span>
+            <button class="btn-interest-action" id="btnLikeMedia" title="對此類型影片感興趣">
+              👍 感興趣 (<span id="mediaLikesCount">0</span>)
+            </button>
+            <button class="btn-interest-action" id="btnDislikeMedia" title="對此類型影片不感興趣">
+              👎 不感興趣 (<span id="mediaDislikesCount">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- 影片播放器與同步互動雙語字幕展示區 -->
+        <div class="video-main-stage">
+          <div class="video-player-wrap">
+            <div id="youtubePlayerPlaceholder" class="yt-iframe-container">
+              <!-- YouTube 官方 Iframe 播放器動態掛載點 -->
+            </div>
+          </div>
+
+          <!-- 雙語字幕與分詞互動辭典面板 -->
+          <div class="subtitles-interactive-panel">
+            <div class="sub-panel-header">
+              <span style="font-weight: 800; font-size: 1.05rem;">📜 同步雙語互動字幕</span>
+              <div class="sub-toggle-switches">
+                <label class="sub-toggle-label">
+                  <input type="checkbox" id="toggleSubJa" checked>
+                  <span>日文字幕</span>
+                </label>
+                <label class="sub-toggle-label">
+                  <input type="checkbox" id="toggleSubZh" checked>
+                  <span>中文字幕</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- 時間軸同步字幕滾動清單 -->
+            <div class="subtitles-stream-box" id="subtitlesStreamBox">
+              <!-- 字幕將根據影片播放時間高亮並包含分詞懸浮效果 -->
+            </div>
+
+            <div class="dict-hint-tip">
+              💡 <b>懸浮字典提示：</b> 將滑鼠游標移至日文單字上方，影片將自動暫停並彈出詳細讀音與釋義卡，支援一鍵直接收藏至個人雲端生詞本！
+            </div>
+          </div>
+        </div>
+
+        <!-- 可選影片列表橫向選擇卡 -->
+        <div class="video-cards-carousel" id="videoCardsCarousel">
+          <!-- 影片卡片由 JavaScript 載入 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 3：優化 3D 生詞卡呈現與複習系統 (Flashcard Review)              -->
+    <!-- ==================================================================== -->
+    <section id="viewFlashcard" class="view-section">
+      <div class="flashcard-toolbar">
+        <div class="filter-group">
+          <span style="font-size: 0.92rem; font-weight: 700; color: var(--text-muted);">生詞掌握度過濾：</span>
+          <button class="btn-filter active" data-filter="all">全部單字</button>
+          <button class="btn-filter" data-filter="hard">🔴 困難 (Hard)</button>
+          <button class="btn-filter" data-filter="need_practice">🟡 需練習 (Practice)</button>
+          <button class="btn-filter" data-filter="mastered">🟢 已掌握 (Mastered)</button>
+        </div>
+        <div class="counter-badge" id="cardCounterBadge">第 1 / 20 張</div>
+      </div>
+
+      <div class="flashcard-stage">
+        <div class="flashcard-3d-scene" id="flashcardScene">
+          <div class="flashcard-inner" id="flashcardElement">
+            <!-- 正面 -->
+            <div class="flashcard-face flashcard-front">
+              <div class="card-top-row">
+                <span class="card-level-tag" id="cardFrontLevel">N5</span>
+                <span class="card-srs-status-tag" id="cardFrontStatus">需練習</span>
+              </div>
+              <div class="card-word-title" id="cardFrontWord">勉強</div>
+              <div class="card-audio-row">
+                <button class="btn-audio-speak" id="btnAudioFront" title="朗讀日語原生發音">
+                  🔊 點擊聆聽真人發音
+                </button>
+              </div>
+              <div class="card-flip-hint">👆 點擊卡片任何位置翻轉至背面查看讀音、釋義與例句</div>
+            </div>
+            <!-- 背面 -->
+            <div class="flashcard-face flashcard-back">
+              <div class="card-top-row">
+                <span class="card-level-tag" id="cardBackLevel">N5</span>
+                <button class="btn-audio-speak-sm" id="btnAudioBack" title="重新朗讀">🔊</button>
+              </div>
+              <div class="card-back-pronounce">
+                <div class="card-kana" id="cardBackReading">べんきょう</div>
+                <div class="card-romaji" id="cardBackRomaji">benkyou</div>
+              </div>
+              <div class="card-meaning-box">
+                <div class="meaning-title">繁體中文釋義</div>
+                <div class="meaning-text" id="cardBackMeaning">學習、讀書</div>
+              </div>
+              <div class="card-example-box" id="cardBackExampleContainer">
+                <div class="ex-ja" id="cardBackExJa">毎日日本語を楽しく勉強します。</div>
+                <div class="ex-zh" id="cardBackExZh">每天都快樂地學習日文。</div>
+              </div>
+              <div class="card-flip-hint">👆 再次點擊卡片即可翻回正面</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SRS 掌握度評級與前後導航控制列 -->
+      <div class="srs-actions-toolbar">
+        <button class="btn-nav" id="btnPrevCard" title="檢視前一張生詞卡">⬅️ 前一張</button>
+        <div class="srs-rate-group">
+          <button class="btn-srs-rate btn-rate-hard" data-srs="hard">
+            <span>🔴 困難</span>
+            <small>加強複習 (Hard)</small>
+          </button>
+          <button class="btn-srs-rate btn-rate-practice" data-srs="need_practice">
+            <span>🟡 需練習</span>
+            <small>溫故知新 (Practice)</small>
+          </button>
+          <button class="btn-srs-rate btn-rate-mastered" data-srs="mastered">
+            <span>🟢 已掌握</span>
+            <small>牢記熟稔 (Mastered)</small>
+          </button>
+        </div>
+        <button class="btn-nav" id="btnNextCard" title="檢視下一張生詞卡">下一張 ➡️</button>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 4：互動單字小測驗遊戲 (Interactive Vocabulary Quiz Game)          -->
+    <!-- ==================================================================== -->
+    <section id="viewQuiz" class="view-section">
+      <!-- 測驗設定與啟動面板 -->
+      <div class="quiz-setup-card" id="quizSetupCard">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">🎮 雲端單字小測驗遊戲</h2>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">
+          支援「四選一選擇題」與「羅馬拼音打字拼寫挑戰」，作答享受 Combo 連擊加權積分與即時掌握度調整。
+        </p>
+        <div class="setup-form-grid">
+          <div class="form-group">
+            <label class="form-label" for="quizModeSelect">測驗遊戲模式</label>
+            <select id="quizModeSelect" class="custom-select">
+              <option value="multiple_choice">四選一選擇題（看中文釋義選正確日文）</option>
+              <option value="spelling">拼寫挑戰（依中文或假名輸入羅馬音）</option>
+              <option value="mixed">隨機混合模式（雙重題型輪番挑戰）</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="quizPoolSelect">測驗單字池範圍</label>
+            <select id="quizPoolSelect" class="custom-select">
+              <option value="all">個人全部雲端單字本</option>
+              <option value="hard">僅限標記為「🔴 困難」的單字</option>
+              <option value="need_practice">僅限「🟡 需練習」的生詞</option>
+              <option value="mastered">複習檢驗「🟢 已掌握」的熟詞</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="quizCountSelect">測驗題數</label>
+            <select id="quizCountSelect" class="custom-select">
+              <option value="5">極速快測 (5 題)</option>
+              <option value="10" selected>標準輪次 (10 題)</option>
+              <option value="20">深度挑戰 (20 題)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-start-quiz" id="btnStartQuiz">開始單字測驗挑戰 🚀</button>
+      </div>
+
+      <!-- 測驗進行中遊戲主畫面 -->
+      <div class="quiz-game-stage" id="quizGameStage" style="display: none;">
+        <div class="quiz-status-header">
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>進度：<b id="quizCurrentNum">1</b> / <span id="quizTotalNum">10</span></span>
+              <span>題型：<b id="quizModeLabel">四選一</b></span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="quizProgressBar" style="width: 10%;"></div>
+            </div>
+          </div>
+          <div class="quiz-score-combo">
+            <div class="score-box">得分：<span id="quizScoreVal">0</span></div>
+            <div class="combo-badge" id="quizComboBadge">🔥 COMBO x0</div>
+          </div>
+        </div>
+
+        <div class="quiz-question-card">
+          <div class="question-header">
+            <span class="q-tag">中文釋義題目</span>
+            <button class="btn-audio-speak-sm" id="btnQuizQuestionAudio" title="朗讀目標單字音訊">🔊</button>
+          </div>
+          <div class="question-prompt" id="quizQuestionPrompt">學習、讀書</div>
+          <div class="question-sub-hint" id="quizQuestionHint">請從下方選出正確的日文表記</div>
+        </div>
+
+        <!-- 題型 A：四選一選項容器 -->
+        <div class="quiz-options-grid" id="quizOptionsContainer">
+          <!-- 選項按鈕由 JavaScript 動態生成 -->
+        </div>
+
+        <!-- 題型 B：拼寫輸入挑戰容器 -->
+        <div class="quiz-spelling-container" id="quizSpellingContainer" style="display: none;">
+          <form id="quizSpellingForm" class="spelling-form">
+            <input type="text" id="quizSpellingInput" class="spelling-input" placeholder="請輸入羅馬拼音或假名發音..." autocomplete="off" autofocus>
+            <button type="submit" class="btn-submit-spelling" id="btnSubmitSpelling">送出作答 ↵</button>
+          </form>
+          <div class="spelling-tips">
+            提示：支援日語羅馬拼音（例如 benkyou）或標準平假名（べんきょう）輸入。
+          </div>
+        </div>
+
+        <!-- 作答即時反饋浮動橫條 -->
+        <div class="quiz-feedback-bar" id="quizFeedbackBar" style="display: none;">
+          <div class="feedback-icon" id="feedbackIcon">🎉</div>
+          <div class="feedback-text-wrap">
+            <div class="feedback-title" id="feedbackTitle">答對了！太厲害了！</div>
+            <div class="feedback-sub" id="feedbackSub">標準單字：勉強 (べんきょう) - benkyou</div>
+          </div>
+          <button class="btn-next-question" id="btnNextQuestion">下一題 ➔</button>
+        </div>
+      </div>
+
+      <!-- 測驗完成成績結算面板 -->
+      <div class="quiz-summary-card" id="quizSummaryCard" style="display: none;">
+        <div class="summary-top">
+          <div class="trophy-icon">🏆</div>
+          <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;">測驗圓滿達成！</h2>
+          <p style="color: var(--text-muted);" id="quizSummaryTagline">表現優異，日語修為持續精進！</p>
+        </div>
+        <div class="summary-stats-grid">
+          <div class="stat-cell">
+            <div class="val" id="summaryFinalScore">0</div>
+            <div class="lbl">最終累積總分</div>
+          </div>
+          <div class="stat-cell">
+            <div class="val" id="summaryAccuracy" style="color: var(--primary-color);">0%</div>
+            <div class="lbl">答對正確率</div>
+          </div>
+          <div class="stat-cell">
+            <div class="val" id="summaryMaxCombo" style="color: #f97316;">0</div>
+            <div class="lbl">最高連續答對 (Max Combo)</div>
+          </div>
+          <div class="stat-cell">
+            <div class="val" id="summaryCorrectVsTotal">0 / 0</div>
+            <div class="lbl">答對題數 / 總題數</div>
+          </div>
+        </div>
+        <div id="quizWrongSection" style="margin-top: 1.5rem; text-align: left; display: none;">
+          <h4 style="font-size: 1.05rem; color: var(--srs-hard); margin-bottom: 0.8rem;">⚠️ 本輪測驗答錯單字（已自動標記困難）：</h4>
+          <ul class="wrong-words-list" id="quizWrongWordsList"></ul>
+        </div>
+        <div class="summary-actions">
+          <button class="btn-start-quiz" id="btnRestartQuiz">🔄 再測驗一次</button>
+          <button class="btn-filter" id="btnReturnSetup">返回測驗首頁</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 5：學習打卡日曆與 GitHub 風格熱力圖 (Streak Calendar)            -->
+    <!-- ==================================================================== -->
+    <section id="viewStreak" class="view-section">
+      <div class="streak-overview-card">
+        <div class="streak-header-hero">
+          <div class="hero-icon">🔥</div>
+          <div>
+            <h2 class="streak-big-num"><span id="streakDaysCount">0</span> 天</h2>
+            <div class="streak-hero-lbl">當前已連續學習打卡天數 (Current Streak)</div>
+          </div>
+        </div>
+        <div class="streak-kpis">
+          <div class="kpi-item">
+            <div class="val" id="streakLongest">0 天</div>
+            <div class="lbl">歷史最長連續紀錄</div>
+          </div>
+          <div class="kpi-item">
+            <div class="val" id="streakTotalDays">0 天</div>
+            <div class="lbl">累計學習天數</div>
+          </div>
+          <div class="kpi-item">
+            <div class="val" id="streakTodayStatus">今日已打卡 ✅</div>
+            <div class="lbl">今日學習進度</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GitHub 風格綠色貢獻熱力圖區塊 -->
+      <div class="github-heatmap-card">
+        <div class="heatmap-header">
+          <h3 style="font-size: 1.2rem; font-weight: 800;">🟩 GitHub 風格日語學習貢獻熱力圖 (Activity Heatmap)</h3>
+          <span style="font-size: 0.9rem; color: var(--text-muted);">每日進行生詞複習、影片字典研讀或小測驗即可累積打卡點數</span>
+        </div>
+        <div class="heatmap-scroll-container">
+          <div class="heatmap-grid" id="githubHeatmapGrid">
+            <!-- 52 週熱力圖方格動態生成 -->
+          </div>
+        </div>
+        <div class="heatmap-legend">
+          <span>少 (Less)</span>
+          <div class="heat-box level-0"></div>
+          <div class="heat-box level-1"></div>
+          <div class="heat-box level-2"></div>
+          <div class="heat-box level-3"></div>
+          <div class="heat-box level-4"></div>
+          <span>多 (More)</span>
+        </div>
+      </div>
+
+      <!-- 月份日曆檢視 -->
+      <div class="streak-calendar-card">
+        <div class="calendar-nav-bar">
+          <button class="btn-cal-nav" id="btnPrevMonth">◀ 上個月</button>
+          <h3 class="cal-title" id="calendarMonthTitle">2026 年 9 月</h3>
+          <button class="btn-cal-nav" id="btnNextMonth">下個月 ▶</button>
+        </div>
+        <div class="calendar-table-wrap">
+          <div class="cal-weekdays">
+            <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+          </div>
+          <div class="cal-days-grid" id="calendarDaysGrid">
+            <!-- 當月日期格子動態生成 -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 視圖 6：個人雲端單字本管理 (Cloud Vocabulary Book)                    -->
+    <!-- ==================================================================== -->
+    <section id="viewVocab" class="view-section">
+      <div class="vocab-toolbar">
+        <input type="text" id="vocabSearchInput" class="search-input" placeholder="🔍 搜尋日文、假名、中文或羅馬音...">
+        <button class="btn-add-word" id="btnOpenAddWord">➕ 新增自訂生詞</button>
+      </div>
+
+      <div class="vocab-table-card">
+        <table class="vocab-table">
+          <thead>
+            <tr>
+              <th>日文單字</th>
+              <th>平假名發音</th>
+              <th>羅馬拼音</th>
+              <th>中文釋義</th>
+              <th>SRS掌握度</th>
+              <th>朗讀發音</th>
+            </tr>
+          </thead>
+          <tbody id="vocabTableBody">
+            <!-- 單字資料將由 JavaScript 動態載入渲染 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- 頁尾宣告與顯目意見反饋通道 (Persistent Footer)                          -->
+  <!-- ====================================================================== -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="brand" style="color: #ffffff;">
+          <span class="brand-icon">🌸</span>
+          <span>日語智慧雲端學習助手 3.1</span>
+        </div>
+        <p class="footer-desc">
+          100% 免費 · 零廣告 · 正版授權 · 安全隔離 · 伴您橫跨修真五重境界
+        </p>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-footer-feedback" id="btnFooterFeedback">
+          <span>💌 提出意見反饋 (直達官方信箱)</span>
+        </button>
+        <div class="footer-email-tag">官方信箱：<b>ytpre.new1@gmail.com</b></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================================================================== -->
+  <!-- 沈浸式動態能力分級定級視窗 (Placement & Onboarding Modal) (New v3.1)       -->
+  <!-- ====================================================================== -->
+  <div class="modal-overlay immersive-blur-modal" id="placementModal">
+    <div class="modal-content placement-wizard-card">
+      <div class="placement-steps-header">
+        <div class="p-step active" id="stepIndicator1">1. 境界目標與興趣</div>
+        <div class="p-step-arrow">➔</div>
+        <div class="p-step" id="stepIndicator2">2. 能力定級測試</div>
+        <div class="p-step-arrow">➔</div>
+        <div class="p-step" id="stepIndicator3">3. 定級完成</div>
+      </div>
+
+      <!-- 階段 1：選擇目標境界與 10 項興趣標籤 -->
+      <div class="placement-step-body active-p-step" id="placementStep1">
+        <h3 class="placement-heading">🎯 請選擇您的挑戰境界目標</h3>
+        <p class="placement-sub">系統將根據您選擇的境界出題，若測驗未過將啟動【智慧降階】，絕不打擊修行動力！</p>
+        
+        <div class="tier-select-cards">
+          <label class="tier-card-option">
+            <input type="radio" name="targetTierSelect" value="新手小白" checked>
+            <div class="tier-card-content">
+              <div class="tier-card-icon">🌱</div>
+              <div class="tier-card-name">新手小白</div>
+              <div class="tier-card-desc">零基礎或從頭打底，跳過測驗，直接完成道基註冊！</div>
+            </div>
+          </label>
+          <label class="tier-card-option">
+            <input type="radio" name="targetTierSelect" value="外門弟子">
+            <div class="tier-card-content">
+              <div class="tier-card-icon">🥋</div>
+              <div class="tier-card-name">外門弟子</div>
+              <div class="tier-card-desc">具備基礎五十音與日常基本單字，挑戰 4 題 N5 試題！</div>
+            </div>
+          </label>
+          <label class="tier-card-option">
+            <input type="radio" name="targetTierSelect" value="內門弟子">
+            <div class="tier-card-content">
+              <div class="tier-card-icon">⚔️</div>
+              <div class="tier-card-name">內門弟子</div>
+              <div class="tier-card-desc">掌握日常實用對話與基礎文法，挑戰 4 題 N4/N3 試題！</div>
+            </div>
+          </label>
+          <label class="tier-card-option">
+            <input type="radio" name="targetTierSelect" value="長老">
+            <div class="tier-card-content">
+              <div class="tier-card-icon">👑</div>
+              <div class="tier-card-name">長老宗師</div>
+              <div class="tier-card-desc">高階日語通達者，挑戰 4 題商務敬語與高階修辭！</div>
+            </div>
+          </label>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <h4 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.4rem;">🌟 自選個人興趣標籤 (最多任選 10 項)</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">系統將自動依據標籤為您推薦最對味的動漫與 J-Pop 影音學習內容：</p>
+          <div class="hobby-tags-selector grid-10" id="onboardingHobbySelector">
+            <label class="hobby-tag-item"><input type="checkbox" value="動漫"><span>動漫 (Anime)</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="J-Pop音樂"><span>J-Pop 音樂</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日本美食"><span>日本美食</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="關東關西旅遊"><span>旅遊觀光</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日劇影視"><span>日劇影視</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="電玩遊戲"><span>電玩遊戲</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="商業金融"><span>商業金融</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="體育運動"><span>體育運動</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="科技前沿"><span>科技前沿</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="歷史文化"><span>歷史文化</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="文學小說"><span>文學小說</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="傳統藝術"><span>傳統藝術</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="時尚美妝"><span>時尚美妝</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日常生活"><span>日常生活</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="萌寵動物"><span>萌寵動物</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="語言學術"><span>語言學術</span></label>
+          </div>
+          <div id="onboardingHobbyCountTip" class="hobby-count-tip">已選 0 / 10 個標籤</div>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: right;">
+          <button class="btn-primary-action" id="btnStartPlacementQuiz">下一步：前往定級 ➔</button>
+        </div>
+      </div>
+
+      <!-- 階段 2：4 題分級考卷 -->
+      <div class="placement-step-body" id="placementStep2" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 class="placement-heading" id="placementQuizTitle">🎯 定級測驗 (共 4 題)</h3>
+          <span class="badge-level level-outer" id="placementTargetBadge">外門弟子門檻</span>
+        </div>
+        <div id="placementQuestionsContainer" class="placement-q-container">
+          <!-- 題目卡片由 JS 動態生成 -->
+        </div>
+        <div style="margin-top: 1.5rem; display: flex; justify-content: space-between;">
+          <button class="btn-nav" id="btnPlacementBack">⬅️ 返回重新選擇</button>
+          <button class="btn-primary-action" id="btnSubmitPlacementAnswers">送出作答並判定定級 🎯</button>
+        </div>
+      </div>
+
+      <!-- 階段 3：定級結算與智慧降階反饋 -->
+      <div class="placement-step-body" id="placementStep3" style="display: none; text-align: center;">
+        <div class="placement-trophy-hero" id="placementResultIcon">🎉</div>
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;" id="placementResultTitle">定級完成！</h2>
+        <div class="placement-result-tier-box">
+          <span>正式定級境界：</span>
+          <span class="promoted-tier-tag" id="placementAssignedTier">外門弟子</span>
+        </div>
+        <p class="placement-result-msg" id="placementResultMsg">
+          測驗得分 80.0%，實力卓絕，恭喜通過外門弟子認證！
+        </p>
+        <div id="placementBadgeAwardedBox" style="margin-bottom: 1.5rem;">
+          <span class="award-badge-pill" id="placementBadgePill">🏆 獲得徽章：登堂入室 · 詞海泛舟</span>
+        </div>
+        <button class="btn-primary-action" id="btnFinishPlacement">展開日語修真之旅 🚀</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 影片單字分詞懸浮互動卡 (Floating Word Tooltip)                           -->
+  <!-- ====================================================================== -->
+  <div class="dict-floating-tooltip" id="dictTooltip" style="display: none;">
+    <div class="tooltip-header">
+      <div>
+        <div class="tooltip-word" id="tooltipWord">毎日</div>
+        <div class="tooltip-reading" id="tooltipReading">まいにち · mainichi</div>
+      </div>
+      <button class="btn-tooltip-audio" id="btnTooltipAudio" title="朗讀發音">🔊</button>
+    </div>
+    <div class="tooltip-meaning" id="tooltipMeaning">每天、日常</div>
+    <div class="tooltip-example" id="tooltipExample">每天都學習日文。</div>
+    <button class="btn-tooltip-save" id="btnTooltipSaveWord">
+      ➕ 收藏至個人雲端生詞本
+    </button>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 使用者個人偏好設定互動視窗 (Preferences Modal)                           -->
+  <!-- ====================================================================== -->
+  <div class="modal-overlay" id="preferencesModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem; font-weight: 800;">⚙️ 個人檔案與偏好設定</h3>
+        <button class="modal-close" id="btnClosePreferences">&times;</button>
+      </div>
+      <div class="pref-user-summary">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ninja" class="pref-avatar" id="prefUserAvatar" alt="頭像">
+        <div>
+          <div class="pref-name" id="prefUserName">日語學習者</div>
+          <div class="pref-email" id="prefUserEmail">user@example.com</div>
+          <div class="pref-level-badge" id="prefUserLevel">境界：新手小白</div>
+        </div>
+      </div>
+      <form id="formPreferences">
+        <div class="form-group">
+          <label class="form-label">自選興趣標籤 (最多任選 10 個，系統動態推薦影音題材)</label>
+          <div class="hobby-tags-selector grid-10" id="hobbyTagsSelector">
+            <label class="hobby-tag-item"><input type="checkbox" value="動漫"><span>動漫 (Anime)</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="J-Pop音樂"><span>J-Pop 音樂</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日本美食"><span>日本美食</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="關東關西旅遊"><span>旅遊觀光</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日劇影視"><span>日劇影視</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="電玩遊戲"><span>電玩遊戲</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="商業金融"><span>商業金融</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="體育運動"><span>體育運動</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="科技前沿"><span>科技前沿</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="歷史文化"><span>歷史文化</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="文學小說"><span>文學小說</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="傳統藝術"><span>傳統藝術</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="時尚美妝"><span>時尚美妝</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="日常生活"><span>日常生活</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="萌寵動物"><span>萌寵動物</span></label>
+            <label class="hobby-tag-item"><input type="checkbox" value="語言學術"><span>語言學術</span></label>
+          </div>
+          <small id="hobbyCountTip" class="hobby-count-tip">已選 0 / 10 個標籤</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label">影音播放字幕預設偏好記憶</label>
+          <div class="sub-pref-row">
+            <label class="pref-check-row">
+              <input type="checkbox" id="prefDefaultSubJa" checked>
+              <span>預設開啟日文字幕 (Japanese Subtitles)</span>
+            </label>
+            <label class="pref-check-row">
+              <input type="checkbox" id="prefDefaultSubZh" checked>
+              <span>預設開啟中文字幕 (Traditional Chinese Subtitles)</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn-start-quiz">儲存個人偏好設定 💾</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 顯目直接意見反饋視窗 (Direct Feedback Modal -> ytpre.new1@gmail.com)    -->
+  <!-- ====================================================================== -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem; font-weight: 800;">💌 傳送寶貴意見反饋 (直達官方信箱)</h3>
+        <button class="modal-close" id="btnCloseFeedback">&times;</button>
+      </div>
+      <div class="feedback-official-card">
+        <div class="fb-target-badge">📬 接收官方專用信箱</div>
+        <div class="fb-target-email">ytpre.new1@gmail.com</div>
+        <p style="font-size: 0.88rem; color: #4338ca; margin-top: 0.3rem;">
+          您的每一條寶貴建議將由系統即時路由送達，感謝您協助我們打造 100% 免費、純淨、極致的日語學習體驗！
+        </p>
+      </div>
+      <form id="formFeedbackSubmit">
+        <div class="form-group">
+          <label class="form-label" for="fbUserName">您的姓名或稱呼</label>
+          <input type="text" id="fbUserName" class="custom-select" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fbUserEmail">您的聯絡信箱</label>
+          <input type="email" id="fbUserEmail" class="custom-select" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fbCategory">反饋類型</label>
+          <select id="fbCategory" class="custom-select">
+            <option value="功能建議">💡 嶄新功能建議</option>
+            <option value="程式錯誤">🐛 程式錯誤與 Bug 回報</option>
+            <option value="學習疑問">❓ 日語學習與單字內容疑問</option>
+            <option value="體驗心得">🌟 學習心得與使用感言</option>
+            <option value="其他反饋">💬 其他反饋</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fbMessage">詳細內容描述 (至少 5 個字元)</label>
+          <textarea id="fbMessage" class="custom-select" rows="4" placeholder="請詳細描述您的想法、遇到的問題或希望新增的功能..." required minlength="5"></textarea>
+        </div>
+        <button type="submit" class="btn-start-quiz">立即送出反饋 ✉️</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 新增自訂生詞互動視窗 (Add Word Modal)                                  -->
+  <!-- ====================================================================== -->
+  <div class="modal-overlay" id="addWordModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.3rem; font-weight: 800;">➕ 新增自訂單字至雲端生詞本</h3>
+        <button class="modal-close" id="btnCloseAddWord">&times;</button>
+      </div>
+      <form id="addWordForm">
+        <div class="form-group">
+          <label class="form-label" for="newWordKanji">日文漢字 / 書寫表記</label>
+          <input type="text" id="newWordKanji" class="custom-select" placeholder="例如：勉強、桜、食べる" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordReading">平假名讀音</label>
+          <input type="text" id="newWordReading" class="custom-select" placeholder="例如：べんきょう、さくら、たべる" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordRomaji">羅馬拼音</label>
+          <input type="text" id="newWordRomaji" class="custom-select" placeholder="例如：benkyou、sakura、taberu" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordMeaning">繁體中文釋義</label>
+          <input type="text" id="newWordMeaning" class="custom-select" placeholder="例如：學習、讀書" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordExJa">實用日文例句 (選填)</label>
+          <input type="text" id="newWordExJa" class="custom-select" placeholder="例如：毎日日本語を勉強します。">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordExZh">例句中文翻譯 (選填)</label>
+          <input type="text" id="newWordExZh" class="custom-select" placeholder="例如：我每天都學習日文。">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="newWordLevel">日檢等級標籤</label>
+          <select id="newWordLevel" class="custom-select">
+            <option value="N5">JLPT N5 (入門基礎)</option>
+            <option value="N4">JLPT N4 (初級日常)</option>
+            <option value="N3">JLPT N3 (中級實用)</option>
+            <option value="N2">JLPT N2 (商務流利)</option>
+            <option value="N1">JLPT N1 (進階高級)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-start-quiz">儲存至雲端單字庫</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- 晉級外門弟子慶祝動畫視窗 (Promotion Celebration Modal)                 -->
+  <!-- ====================================================================== -->
+  <div class="modal-overlay" id="promotionModal">
+    <div class="modal-content promotion-card">
+      <div class="celebration-fireworks">🎆 🎊 ✨</div>
+      <h2 style="font-size: 1.8rem; color: #4f46e5; margin-bottom: 0.5rem;">恭喜！境界大突破！</h2>
+      <div class="promoted-badge-box">
+        <span class="old-level-txt">新手小白</span>
+        <span class="arrow-spark">➔</span>
+        <span class="new-level-txt" id="modalNewLevelTxt">外門弟子</span>
+      </div>
+      <p class="promotion-msg" id="promotionMsgText">
+        您已成功熟練五十音並在三項試煉中表現卓絕，成功晉升為【外門弟子】！全站動漫 J-Pop 雙語字典與進階辭庫全面解鎖！
+      </p>
+      <button class="btn-primary-action" id="btnExploreUnlockedFeatures">
+        解鎖進入雙語影音字典 🎬
+      </button>
+    </div>
+  </div>
+
+  <!-- 提示訊息 Toast 容器 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 載入核心前端互動腳本 (附帶防快取版本參數) -->
+  <script src="/static/script.js?v=3.1.0"></script>
+</body>
+</html>
